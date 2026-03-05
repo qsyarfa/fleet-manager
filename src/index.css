@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: #0c0d10;
+    color: #e2e4ea;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #13151a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2d36;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3d4a;
+  }
+}
+
+@layer components {
+  .stat-card {
+    @apply bg-fleet-card border border-fleet-border rounded-lg p-5 flex flex-col gap-2;
+  }
+
+  .section-header {
+    @apply text-xs font-mono font-medium uppercase tracking-widest text-fleet-subtext;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono font-medium;
+  }
+
+  .badge-active   { @apply badge bg-green-500/15 text-green-400 border border-green-500/30; }
+  .badge-idle     { @apply badge bg-yellow-500/15 text-yellow-400 border border-yellow-500/30; }
+  .badge-offline  { @apply badge bg-red-500/15 text-red-400 border border-red-500/30; }
+  .badge-maintenance { @apply badge bg-orange-500/15 text-orange-400 border border-orange-500/30; }
+  .badge-enroute  { @apply badge bg-cyan-500/15 text-cyan-400 border border-cyan-500/30; }
+
+  .table-row {
+    @apply border-b border-fleet-border last:border-0 hover:bg-fleet-surface/50 transition-colors;
+  }
+
+  .table-cell {
+    @apply px-4 py-3 text-sm text-fleet-text;
+  }
+
+  .table-head {
+    @apply px-4 py-3 text-left text-xs font-mono uppercase tracking-wider text-fleet-subtext;
+  }
+
+  .btn-primary {
+    @apply bg-fleet-amber text-black px-4 py-2 rounded font-semibold text-sm
+           hover:bg-amber-400 active:bg-amber-600 transition-colors;
+  }
+
+  .btn-ghost {
+    @apply border border-fleet-border text-fleet-subtext px-4 py-2 rounded text-sm
+           hover:border-fleet-muted hover:text-fleet-text transition-colors;
+  }
+
+  .input-field {
+    @apply bg-fleet-surface border border-fleet-border rounded px-3 py-2 text-sm
+           text-fleet-text placeholder-fleet-subtext focus:outline-none focus:border-fleet-amber
+           transition-colors;
+  }
+
+  .progress-bar {
+    @apply h-1.5 rounded-full bg-fleet-border overflow-hidden;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-fleet-subtext text-sm
+           hover:bg-fleet-surface hover:text-fleet-text transition-all cursor-pointer;
+  }
+
+  .nav-link-active {
+    @apply nav-link bg-fleet-amber/10 text-fleet-amber border border-fleet-amber/20;
+  }
+
+  .dot-live {
+    @apply w-2 h-2 rounded-full bg-green-400 animate-blink;
+  }
+}
