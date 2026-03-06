@@ -8,7 +8,7 @@ import Drivers from './components/Drivers/Drivers'
 import Maintenance from './components/Maintenance/Maintenance'
 
 const PAGE_META = {
-  '/':            { title: 'Live Dashboard',     subtitle: 'Real-time fleet overview · Midwest US' },
+  '/':            { title: 'Live Dashboard',     subtitle: 'Gambaran keseluruhan armada masa nyata · Semenanjung Malaysia' },
   '/vehicles':    { title: 'Vehicle Fleet',      subtitle: 'Manage and monitor all vehicles' },
   '/trips':       { title: 'Trip Logs',          subtitle: 'Active and historical trip records' },
   '/drivers':     { title: 'Driver Management',  subtitle: 'Driver roster, status, and compliance' },

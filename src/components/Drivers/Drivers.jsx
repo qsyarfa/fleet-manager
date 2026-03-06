@@ -77,7 +77,7 @@ function DriverCard({ driver }) {
           { label: 'Violations', value: driver.violations },
         ].map(({ label, value }) => (
           <div key={label} className="bg-fleet-surface rounded-lg p-2 text-center">
-            <div className={`text-lg font-bold font-mono ${label === 'Violations' && driver.violations > 0 ? 'text-red-400' : 'text-fleet-text'}`}>
+            <div className={`text-lg font-bold font-mono ${label === 'Violations' && driver.violations > 0 ? 'text-red-600' : 'text-fleet-text'}`}>
               {value}
             </div>
             <div className="text-xs text-fleet-subtext">{label}</div>
@@ -88,9 +88,9 @@ function DriverCard({ driver }) {
       {/* Info rows */}
       <div className="space-y-1.5 text-xs">
         <div className="flex items-center gap-2 text-fleet-subtext">
-          <Shield size={11} className={licenseExpired ? 'text-red-400' : licenseExpiring ? 'text-yellow-400' : 'text-fleet-amber'} />
+          <Shield size={11} className={licenseExpired ? 'text-red-600' : licenseExpiring ? 'text-yellow-700' : 'text-fleet-amber'} />
           <span className="font-mono">{driver.license}</span>
-          <span className={`ml-auto font-mono ${licenseExpired ? 'text-red-400 font-bold' : licenseExpiring ? 'text-yellow-400' : 'text-fleet-subtext'}`}>
+          <span className={`ml-auto font-mono ${licenseExpired ? 'text-red-600 font-bold' : licenseExpiring ? 'text-yellow-700' : 'text-fleet-subtext'}`}>
             {licenseExpired ? 'EXPIRED' : licenseExpiring ? 'Exp. soon' : driver.licenseExpiry}
           </span>
         </div>
@@ -112,8 +112,8 @@ function DriverCard({ driver }) {
       {/* Alerts */}
       {(licenseExpired || licenseExpiring) && (
         <div className={`mt-3 flex items-center gap-2 p-2 rounded ${licenseExpired ? 'bg-red-500/10 border border-red-500/30' : 'bg-yellow-500/10 border border-yellow-500/30'}`}>
-          <AlertTriangle size={11} className={licenseExpired ? 'text-red-400' : 'text-yellow-400'} />
-          <span className={`text-xs font-mono ${licenseExpired ? 'text-red-400' : 'text-yellow-400'}`}>
+          <AlertTriangle size={11} className={licenseExpired ? 'text-red-600' : 'text-yellow-700'} />
+          <span className={`text-xs font-mono ${licenseExpired ? 'text-red-600' : 'text-yellow-700'}`}>
             {licenseExpired ? 'License EXPIRED — grounded' : 'License expiring within 90 days'}
           </span>
         </div>
@@ -151,7 +151,7 @@ export default function Drivers() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: 'Total Drivers', value: stats.total,     color: 'text-fleet-text' },
-          { label: 'On Duty',       value: stats.onDuty,    color: 'text-green-400' },
+          { label: 'On Duty',       value: stats.onDuty,    color: 'text-green-600' },
           { label: 'Off Duty',      value: stats.offDuty,   color: 'text-fleet-subtext' },
           { label: 'Avg Rating',    value: `${stats.avgRating} ★`, color: 'text-fleet-amber' },
         ].map(({ label, value, color }) => (
@@ -165,8 +165,8 @@ export default function Drivers() {
       {/* License alert banner */}
       {stats.expired > 0 && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 flex items-center gap-3">
-          <AlertTriangle size={16} className="text-red-400 flex-shrink-0" />
-          <span className="text-sm text-red-300">
+          <AlertTriangle size={16} className="text-red-600 flex-shrink-0" />
+          <span className="text-sm text-red-700">
             <strong>{stats.expired} driver(s)</strong> have expired licenses and must be grounded until renewed.
           </span>
         </div>

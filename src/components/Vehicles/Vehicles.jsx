@@ -23,7 +23,7 @@ const TYPES    = ['all', 'Heavy Truck', 'Medium Truck', 'Cargo Van']
 
 function FuelIndicator({ level }) {
   const color = level < 20 ? 'bg-red-500' : level < 40 ? 'bg-yellow-500' : 'bg-green-500'
-  const textColor = level < 20 ? 'text-red-400' : level < 40 ? 'text-yellow-400' : 'text-fleet-subtext'
+  const textColor = level < 20 ? 'text-red-600' : level < 40 ? 'text-yellow-700' : 'text-fleet-subtext'
   return (
     <div className="flex items-center gap-2 w-28">
       <div className="progress-bar flex-1">
@@ -66,12 +66,12 @@ function VehicleDetailModal({ vehicle, onClose }) {
                 <div className="text-xs text-fleet-subtext">mph</div>
               </div>
               <div className="bg-fleet-surface rounded-lg p-3 text-center">
-                <Fuel size={14} className={`mx-auto mb-1 ${vehicle.fuelLevel < 20 ? 'text-red-400' : 'text-fleet-amber'}`} />
-                <div className={`text-xl font-bold font-mono ${vehicle.fuelLevel < 20 ? 'text-red-400' : 'text-fleet-text'}`}>{vehicle.fuelLevel}%</div>
+                <Fuel size={14} className={`mx-auto mb-1 ${vehicle.fuelLevel < 20 ? 'text-red-600' : 'text-fleet-amber'}`} />
+                <div className={`text-xl font-bold font-mono ${vehicle.fuelLevel < 20 ? 'text-red-600' : 'text-fleet-text'}`}>{vehicle.fuelLevel}%</div>
                 <div className="text-xs text-fleet-subtext">fuel</div>
               </div>
               <div className="bg-fleet-surface rounded-lg p-3 text-center">
-                <Thermometer size={14} className="mx-auto text-cyan-400 mb-1" />
+                <Thermometer size={14} className="mx-auto text-cyan-700 mb-1" />
                 <div className="text-xl font-bold font-mono text-fleet-text">{vehicle.engineTemp}°</div>
                 <div className="text-xs text-fleet-subtext">engine °F</div>
               </div>
@@ -224,7 +224,7 @@ export default function Vehicles() {
                       <span className="font-mono text-sm text-fleet-text">{v.odometer.toLocaleString()} <span className="text-fleet-subtext text-xs">mi</span></span>
                     </td>
                     <td className="table-cell">
-                      <span className={`text-xs font-mono ${new Date(v.nextService) <= new Date() ? 'text-red-400' : 'text-fleet-subtext'}`}>
+                      <span className={`text-xs font-mono ${new Date(v.nextService) <= new Date() ? 'text-red-600' : 'text-fleet-subtext'}`}>
                         {v.nextService}
                       </span>
                     </td>

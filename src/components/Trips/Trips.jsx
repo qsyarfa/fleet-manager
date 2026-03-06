@@ -30,7 +30,7 @@ function ElapsedBadge({ startTime }) {
   const h = Math.floor(elapsed / 60)
   const m = elapsed % 60
   return (
-    <span className="text-xs font-mono text-cyan-400">
+    <span className="text-xs font-mono text-cyan-700">
       {h > 0 ? `${h}h ${m}m` : `${m}m`} elapsed
     </span>
   )
@@ -70,8 +70,8 @@ export default function Trips() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: 'Total Trips', value: stats.total, color: 'text-fleet-text' },
-          { label: 'In Progress', value: stats.active, color: 'text-cyan-400' },
-          { label: 'Completed', value: stats.completed, color: 'text-green-400' },
+          { label: 'In Progress', value: stats.active, color: 'text-cyan-700' },
+          { label: 'Completed', value: stats.completed, color: 'text-green-600' },
           { label: 'Miles Logged', value: stats.totalMiles.toLocaleString(), color: 'text-fleet-amber' },
         ].map(({ label, value, color }) => (
           <div key={label} className="stat-card">

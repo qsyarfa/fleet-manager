@@ -53,7 +53,7 @@ export default function Sidebar() {
             <Icon size={16} />
             <span className="flex-1">{label}</span>
             {label === 'Dashboard' && criticalCount > 0 && (
-              <span className="flex items-center gap-1 bg-red-500/20 text-red-400 text-xs px-1.5 py-0.5 rounded font-mono border border-red-500/30">
+              <span className="flex items-center gap-1 bg-red-500/20 text-red-700 text-xs px-1.5 py-0.5 rounded font-mono border border-red-500/30">
                 <AlertTriangle size={9} />
                 {criticalCount}
               </span>
@@ -68,11 +68,11 @@ export default function Sidebar() {
         <div className="text-xs text-fleet-subtext font-mono">
           <div className="flex justify-between mb-1">
             <span>Fleet ID</span>
-            <span className="text-fleet-amber">FLT-CHI-001</span>
+            <span className="text-fleet-amber">FLT-KUL-001</span>
           </div>
           <div className="flex justify-between">
             <span>Region</span>
-            <span className="text-fleet-text">Midwest US</span>
+            <span className="text-fleet-text">Malaysia</span>
           </div>
         </div>
       </div>

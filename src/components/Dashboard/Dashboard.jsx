@@ -21,9 +21,9 @@ const SEVERITY_CLASS = {
   low:      'border-fleet-border bg-fleet-surface',
 }
 const SEVERITY_TEXT = {
-  critical: 'text-red-400',
-  high:     'text-orange-400',
-  medium:   'text-yellow-400',
+  critical: 'text-red-600',
+  high:     'text-orange-600',
+  medium:   'text-yellow-700',
   low:      'text-fleet-subtext',
 }
 
@@ -34,7 +34,7 @@ function StatCard({ icon: Icon, label, value, sub, accent }) {
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${accent}`}>
           <Icon size={16} className="text-black" />
         </div>
-        <TrendingUp size={13} className="text-green-400 opacity-60" />
+        <TrendingUp size={13} className="text-green-600 opacity-60" />
       </div>
       <div>
         <div className="text-2xl font-bold text-fleet-text font-mono">{value}</div>
@@ -59,7 +59,7 @@ function FuelBar({ vehicle }) {
         <div className="progress-bar flex-1">
           <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
         </div>
-        <span className={`text-xs font-mono w-8 text-right ${pct < 20 ? 'text-red-400' : 'text-fleet-subtext'}`}>
+        <span className={`text-xs font-mono w-8 text-right ${pct < 20 ? 'text-red-600' : 'text-fleet-subtext'}`}>
           {pct}%
         </span>
       </div>
@@ -231,7 +231,7 @@ export default function Dashboard() {
         <div className="bg-fleet-card border border-fleet-border rounded-lg p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="section-header">Live Trips</div>
-            <div className="flex items-center gap-1.5 text-xs font-mono text-green-400">
+            <div className="flex items-center gap-1.5 text-xs font-mono text-green-600">
               <span className="dot-live" />
               {activeTrips.length} active
             </div>
