@@ -149,6 +149,34 @@ All data lives in `src/data/mockData.js` and is structured for straightforward r
 
 ---
 
+## Contributing
+
+### Commit Format
+
+```
+type: short description
+```
+
+| Type | When to use |
+|------|-------------|
+| `feat` | New feature or page |
+| `fix` | Bug fix |
+| `style` | UI/CSS changes only |
+| `chore` | Config, deps, tooling |
+| `docs` | Documentation only |
+| `refactor` | Code restructure, no behavior change |
+
+Example: `feat: add fuel alert threshold to dashboard`
+
+### Claude Code
+
+This project includes a `CLAUDE.md` with conventions for AI-assisted development.
+Custom slash command available in Claude Code:
+
+- `/new-feature <name>` — scaffolds a new page, route, and nav link
+
+---
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
