@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Search, Clock, Package, MapPin } from 'lucide-react'
-import { trips, getDriver, getVehicle } from '../../data/mockData'
+import React, { useState } from 'react'
+import { Search, Package, MapPin } from 'lucide-react'
+import { trips as allTrips, getDriver, getVehicle } from '../../data/mockData'
 
 const STATUS_BADGE = {
   'in-progress': 'badge-enroute',
@@ -30,38 +30,34 @@ function ElapsedBadge({ startTime }) {
   const h = Math.floor(elapsed / 60)
   const m = elapsed % 60
   return (
-    <span className="text-xs font-mono text-cyan-700">
+    <span className="text-xs font-mono text-fleet-cyan">
       {h > 0 ? `${h}h ${m}m` : `${m}m`} elapsed
     </span>
   )
 }
 
 export default function Trips() {
-  const [search, setSearch]   = useState('')
-  const [status, setStatus]   = useState('all')
+  const [search, setSearch]     = useState('')
+  const [status, setStatus]     = useState('all')
   const [expanded, setExpanded] = useState(null)
 
-  const sorted = [...trips].sort((a, b) => new Date(b.startTime) - new Date(a.startTime))
-
-  const filtered = sorted.filter(t => {
-    const driver  = getDriver(t.driverId)
-    const vehicle = getVehicle(t.vehicleId)
+  const filtered = allTrips.filter(t => {
     const q = search.toLowerCase()
     const matchSearch = t.id.toLowerCase().includes(q)
       || t.origin.toLowerCase().includes(q)
       || t.destination.toLowerCase().includes(q)
-      || (driver?.name.toLowerCase().includes(q))
-      || (vehicle?.id.toLowerCase().includes(q))
+      || (getDriver(t.driverId)?.name.toLowerCase().includes(q))
+      || (t.vehicleId?.toLowerCase().includes(q))
     const matchStatus = status === 'all' || t.status === status
     return matchSearch && matchStatus
   })
 
   const stats = {
-    total:      trips.length,
-    active:     trips.filter(t => t.status === 'in-progress').length,
-    completed:  trips.filter(t => t.status === 'completed').length,
-    cancelled:  trips.filter(t => t.status === 'cancelled').length,
-    totalMiles: trips.filter(t => t.status === 'completed').reduce((a, t) => a + t.distance, 0),
+    total:      allTrips.length,
+    active:     allTrips.filter(t => t.status === 'in-progress').length,
+    completed:  allTrips.filter(t => t.status === 'completed').length,
+    cancelled:  allTrips.filter(t => t.status === 'cancelled').length,
+    totalMiles: allTrips.filter(t => t.status === 'completed').reduce((a, t) => a + t.distance, 0),
   }
 
   return (
@@ -69,10 +65,10 @@ export default function Trips() {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Total Trips', value: stats.total, color: 'text-fleet-text' },
-          { label: 'In Progress', value: stats.active, color: 'text-cyan-700' },
-          { label: 'Completed', value: stats.completed, color: 'text-green-600' },
-          { label: 'Miles Logged', value: stats.totalMiles.toLocaleString(), color: 'text-fleet-amber' },
+          { label: 'Total Trips', value: stats.total,                         color: 'text-fleet-text' },
+          { label: 'In Progress', value: stats.active,                        color: 'text-fleet-cyan' },
+          { label: 'Completed',   value: stats.completed,                     color: 'text-fleet-green' },
+          { label: 'Miles Logged',value: stats.totalMiles.toLocaleString(),   color: 'text-fleet-amber' },
         ].map(({ label, value, color }) => (
           <div key={label} className="stat-card">
             <div className="section-header">{label}</div>
@@ -126,14 +122,11 @@ export default function Trips() {
             </thead>
             <tbody>
               {filtered.map(trip => {
-                const driver  = getDriver(trip.driverId)
-                const vehicle = getVehicle(trip.vehicleId)
                 const isExpanded = expanded === trip.id
 
                 return (
-                  <>
+                  <React.Fragment key={trip.id}>
                     <tr
-                      key={trip.id}
                       className="table-row cursor-pointer"
                       onClick={() => setExpanded(isExpanded ? null : trip.id)}
                     >
@@ -150,8 +143,8 @@ export default function Trips() {
                         </div>
                       </td>
                       <td className="table-cell">
-                        <div className="text-sm text-fleet-text">{driver?.name ?? '—'}</div>
-                        <div className="text-xs text-fleet-subtext font-mono">{vehicle?.id ?? '—'}</div>
+                        <div className="text-sm text-fleet-text">{getDriver(trip.driverId)?.name ?? '—'}</div>
+                        <div className="text-xs text-fleet-subtext font-mono">{trip.vehicleId ?? '—'}</div>
                       </td>
                       <td className="table-cell">
                         <div className="text-xs text-fleet-text font-mono">{formatDate(trip.startTime)}</div>
@@ -185,7 +178,7 @@ export default function Trips() {
                             </div>
                             <div>
                               <div className="text-fleet-subtext text-xs font-mono mb-1">VEHICLE</div>
-                              <div className="text-fleet-text">{vehicle?.name ?? '—'}</div>
+                              <div className="text-fleet-text">{getVehicle(trip.vehicleId)?.name ?? '—'}</div>
                             </div>
                             <div>
                               <div className="text-fleet-subtext text-xs font-mono mb-1">FUEL USED</div>
@@ -201,7 +194,7 @@ export default function Trips() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 )
               })}
             </tbody>

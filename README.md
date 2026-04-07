@@ -135,14 +135,14 @@ fleet-manager/
 
 ## Mock Data
 
-The app ships with realistic mock data covering a Midwest US fleet operation:
+The app ships with realistic mock data covering a Malaysian commercial fleet operation:
 
 | Dataset      | Records | Details                                              |
 |--------------|---------|------------------------------------------------------|
-| Vehicles     | 10      | Heavy trucks and cargo vans with live telemetry      |
-| Drivers      | 8       | CDL-A/B drivers with ratings and compliance status   |
-| Trips        | 15      | Active, completed, and cancelled trips               |
-| Maintenance  | 12      | Pending, in-progress, scheduled, and completed jobs  |
+| Vehicles     | 13      | Heavy trucks and cargo vans with live telemetry      |
+| Drivers      | 13      | GDL-A/B drivers with ratings and compliance status   |
+| Trips        | 24      | Active, completed, and cancelled trips               |
+| Maintenance  | 20      | Pending, in-progress, scheduled, and completed jobs  |
 | Alerts       | 6       | Critical and warning-level fleet alerts              |
 
 All data lives in `src/data/mockData.js` and is structured for straightforward replacement with a REST API or WebSocket feed.
@@ -171,9 +171,17 @@ Example: `feat: add fuel alert threshold to dashboard`
 ### Claude Code
 
 This project includes a `CLAUDE.md` with conventions for AI-assisted development.
-Custom slash command available in Claude Code:
+Custom slash commands available in Claude Code:
 
-- `/new-feature <name>` — scaffolds a new page, route, and nav link
+| Command | Description |
+|---------|-------------|
+| `/new-feature <name>` | Scaffolds a new page, route, and nav link |
+| `/fix-bug <description>` | Diagnoses and minimally fixes a described bug |
+| `/review <file>` | Reviews a file for convention violations and token misuse |
+| `/add-mock-data <dataset>` | Adds new records to `mockData.js` following existing patterns |
+| `/add-route <name>` | Adds route, PAGE_META entry, and nav link for a new page |
+| `/cleanup` | Removes console.logs, unused imports, and convention violations |
+| `/handover` | Produces a project state summary for a new developer |
 
 ---
 

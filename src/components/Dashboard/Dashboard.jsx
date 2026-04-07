@@ -1,17 +1,15 @@
 import {
-  Truck, Users, MapPin, AlertTriangle,
-  TrendingUp, Fuel, Activity, Clock, CheckCircle, XCircle,
+  Truck, Users, AlertTriangle,
+  TrendingUp, Activity,
 } from 'lucide-react'
-import {
-  vehicles, drivers, trips, alerts, statusCounts, fleetStats, getDriver,
-} from '../../data/mockData'
+import { vehicles, trips, alerts, statusCounts, fleetStats, drivers } from '../../data/mockData'
 
 const STATUS_COLOR = {
-  active:      'bg-green-400',
-  enroute:     'bg-cyan-400',
-  idle:        'bg-yellow-400',
-  maintenance: 'bg-orange-400',
-  offline:     'bg-red-400',
+  active:      'bg-fleet-green',
+  enroute:     'bg-fleet-cyan',
+  idle:        'bg-fleet-yellow',
+  maintenance: 'bg-fleet-orange',
+  offline:     'bg-fleet-red',
 }
 
 const SEVERITY_CLASS = {
@@ -21,9 +19,9 @@ const SEVERITY_CLASS = {
   low:      'border-fleet-border bg-fleet-surface',
 }
 const SEVERITY_TEXT = {
-  critical: 'text-red-600',
-  high:     'text-orange-600',
-  medium:   'text-yellow-700',
+  critical: 'text-fleet-red',
+  high:     'text-fleet-orange',
+  medium:   'text-fleet-yellow',
   low:      'text-fleet-subtext',
 }
 
@@ -34,7 +32,7 @@ function StatCard({ icon: Icon, label, value, sub, accent }) {
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${accent}`}>
           <Icon size={16} className="text-black" />
         </div>
-        <TrendingUp size={13} className="text-green-600 opacity-60" />
+        <TrendingUp size={13} className="text-fleet-green opacity-60" />
       </div>
       <div>
         <div className="text-2xl font-bold text-fleet-text font-mono">{value}</div>
@@ -46,8 +44,8 @@ function StatCard({ icon: Icon, label, value, sub, accent }) {
 }
 
 function FuelBar({ vehicle }) {
-  const pct = vehicle.fuelLevel
-  const color = pct < 20 ? 'bg-red-500' : pct < 40 ? 'bg-yellow-500' : 'bg-green-500'
+  const pct   = vehicle.fuelLevel
+  const color = pct < 20 ? 'bg-fleet-red' : pct < 40 ? 'bg-fleet-yellow' : 'bg-fleet-green'
   return (
     <div className="flex items-center gap-3 py-2 border-b border-fleet-border last:border-0">
       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_COLOR[vehicle.status]}`} />
@@ -59,7 +57,7 @@ function FuelBar({ vehicle }) {
         <div className="progress-bar flex-1">
           <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
         </div>
-        <span className={`text-xs font-mono w-8 text-right ${pct < 20 ? 'text-red-600' : 'text-fleet-subtext'}`}>
+        <span className={`text-xs font-mono w-8 text-right ${pct < 20 ? 'text-fleet-red' : 'text-fleet-subtext'}`}>
           {pct}%
         </span>
       </div>
@@ -68,9 +66,7 @@ function FuelBar({ vehicle }) {
 }
 
 function ActiveTripRow({ trip }) {
-  const driver = getDriver(trip.driverId)
-  const vehicle = vehicles.find(v => v.id === trip.vehicleId)
-  const start = new Date(trip.startTime)
+  const start   = new Date(trip.startTime)
   const elapsed = Math.round((Date.now() - start) / 60000)
 
   return (
@@ -81,7 +77,7 @@ function ActiveTripRow({ trip }) {
           {trip.origin} → {trip.destination}
         </div>
         <div className="text-xs text-fleet-subtext font-mono">
-          {vehicle?.id} · {driver?.name}
+          {trip.vehicleId} · {trip.driverName}
         </div>
       </div>
       <div className="text-right flex-shrink-0">
@@ -94,7 +90,9 @@ function ActiveTripRow({ trip }) {
 
 export default function Dashboard() {
   const activeTrips = trips.filter(t => t.status === 'in-progress')
-  const avgFuel = Math.round(vehicles.reduce((a, v) => a + v.fuelLevel, 0) / vehicles.length)
+  const avgFuel     = vehicles.length
+    ? Math.round(vehicles.reduce((a, v) => a + v.fuelLevel, 0) / vehicles.length)
+    : 0
 
   return (
     <div className="p-6 space-y-6">
@@ -112,21 +110,21 @@ export default function Dashboard() {
           label="Active Now"
           value={statusCounts.active + statusCounts.enroute}
           sub={`${statusCounts.idle} idle`}
-          accent="bg-green-500"
+          accent="bg-fleet-green"
         />
         <StatCard
           icon={Users}
           label="On-Duty Drivers"
           value={fleetStats.activeDrivers}
           sub={`${drivers.length} total drivers`}
-          accent="bg-cyan-500"
+          accent="bg-fleet-cyan"
         />
         <StatCard
           icon={AlertTriangle}
           label="Critical Alerts"
           value={fleetStats.criticalAlerts}
           sub="Require immediate action"
-          accent="bg-red-500"
+          accent="bg-fleet-red"
         />
       </div>
 
@@ -137,7 +135,7 @@ export default function Dashboard() {
           <div className="text-3xl font-bold font-mono text-fleet-text">{avgFuel}<span className="text-lg text-fleet-subtext">%</span></div>
           <div className="progress-bar mt-2">
             <div
-              className={`h-full rounded-full ${avgFuel < 30 ? 'bg-red-500' : avgFuel < 50 ? 'bg-yellow-500' : 'bg-fleet-amber'}`}
+              className={`h-full rounded-full ${avgFuel < 30 ? 'bg-fleet-red' : avgFuel < 50 ? 'bg-fleet-yellow' : 'bg-fleet-amber'}`}
               style={{ width: `${avgFuel}%` }}
             />
           </div>
@@ -189,7 +187,7 @@ export default function Dashboard() {
                 <div className="text-xs text-fleet-subtext capitalize">{v.status}</div>
                 <div className="progress-bar">
                   <div
-                    className={`h-full rounded-full ${v.fuelLevel < 20 ? 'bg-red-500' : v.fuelLevel < 40 ? 'bg-yellow-500' : 'bg-fleet-amber'}`}
+                    className={`h-full rounded-full ${v.fuelLevel < 20 ? 'bg-fleet-red' : v.fuelLevel < 40 ? 'bg-fleet-yellow' : 'bg-fleet-amber'}`}
                     style={{ width: `${v.fuelLevel}%` }}
                   />
                 </div>
@@ -231,7 +229,7 @@ export default function Dashboard() {
         <div className="bg-fleet-card border border-fleet-border rounded-lg p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="section-header">Live Trips</div>
-            <div className="flex items-center gap-1.5 text-xs font-mono text-green-600">
+            <div className="flex items-center gap-1.5 text-xs font-mono text-fleet-green">
               <span className="dot-live" />
               {activeTrips.length} active
             </div>

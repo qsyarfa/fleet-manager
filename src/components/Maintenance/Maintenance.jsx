@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Search, Wrench, Calendar, DollarSign, AlertTriangle, Clock } from 'lucide-react'
-import { maintenanceRecords, getVehicle } from '../../data/mockData'
+import { maintenanceRecords as allMaintenance, getVehicle } from '../../data/mockData'
 
 const STATUS_BADGE = {
   'in-progress': 'badge-enroute',
@@ -10,13 +10,13 @@ const STATUS_BADGE = {
 }
 
 const PRIORITY_CONFIG = {
-  critical: { cls: 'bg-red-500/10 border-red-500/30 text-red-700',    dot: 'bg-red-500',    label: 'CRITICAL' },
-  high:     { cls: 'bg-orange-500/10 border-orange-500/30 text-orange-700', dot: 'bg-orange-500', label: 'HIGH' },
-  medium:   { cls: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-700', dot: 'bg-yellow-500', label: 'MEDIUM' },
+  critical: { cls: 'bg-red-500/10 border-red-500/30 text-fleet-red',    dot: 'bg-fleet-red',    label: 'CRITICAL' },
+  high:     { cls: 'bg-orange-500/10 border-orange-500/30 text-fleet-orange', dot: 'bg-fleet-orange', label: 'HIGH' },
+  medium:   { cls: 'bg-yellow-500/10 border-yellow-500/30 text-fleet-yellow', dot: 'bg-fleet-yellow', label: 'MEDIUM' },
   low:      { cls: 'bg-fleet-border/50 border-fleet-border text-fleet-subtext', dot: 'bg-fleet-muted', label: 'LOW' },
 }
 
-const STATUSES = ['all', 'pending', 'in-progress', 'scheduled', 'completed']
+const STATUSES   = ['all', 'pending', 'in-progress', 'scheduled', 'completed']
 const PRIORITIES = ['all', 'critical', 'high', 'medium', 'low']
 
 function isOverdue(record) {
@@ -24,9 +24,8 @@ function isOverdue(record) {
 }
 
 function MaintenanceCard({ record }) {
-  const vehicle = getVehicle(record.vehicleId)
   const priority = PRIORITY_CONFIG[record.priority]
-  const overdue = isOverdue(record)
+  const overdue  = isOverdue(record)
 
   return (
     <div className={`bg-fleet-card rounded-lg border p-5 hover:border-fleet-muted transition-colors ${overdue ? 'border-red-500/40' : 'border-fleet-border'}`}>
@@ -36,7 +35,7 @@ function MaintenanceCard({ record }) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-fleet-text">{record.type}</span>
             {overdue && (
-              <span className="badge bg-red-500/20 border border-red-500/40 text-red-700">
+              <span className="badge bg-red-500/20 border border-red-500/40 text-fleet-red">
                 <AlertTriangle size={9} /> OVERDUE
               </span>
             )}
@@ -62,7 +61,7 @@ function MaintenanceCard({ record }) {
             <Wrench size={11} className="text-fleet-amber" />
             <span className="text-xs text-fleet-subtext font-mono">Vehicle</span>
           </div>
-          <div className="text-xs text-fleet-text truncate">{vehicle?.name ?? '—'}</div>
+          <div className="text-xs text-fleet-text truncate">{getVehicle(record.vehicleId)?.name ?? '—'}</div>
         </div>
         <div className="bg-fleet-surface rounded-lg p-3">
           <div className="flex items-center gap-1.5 mb-1">
@@ -71,7 +70,7 @@ function MaintenanceCard({ record }) {
               {record.status === 'completed' ? 'Completed' : 'Scheduled'}
             </span>
           </div>
-          <div className={`text-xs font-mono ${overdue ? 'text-red-600' : 'text-fleet-text'}`}>
+          <div className={`text-xs font-mono ${overdue ? 'text-fleet-red' : 'text-fleet-text'}`}>
             {record.status === 'completed' ? record.completedDate : record.scheduledDate}
           </div>
         </div>
@@ -116,14 +115,13 @@ export default function Maintenance() {
   const [status, setStatus]     = useState('all')
   const [priority, setPriority] = useState('all')
 
-  const filtered = maintenanceRecords.filter(r => {
-    const vehicle = getVehicle(r.vehicleId)
+  const filtered = allMaintenance.filter(r => {
     const q = search.toLowerCase()
     const matchSearch = r.id.toLowerCase().includes(q)
       || r.type.toLowerCase().includes(q)
       || r.vehicleId.toLowerCase().includes(q)
       || r.technicianName.toLowerCase().includes(q)
-      || vehicle?.name.toLowerCase().includes(q)
+      || (getVehicle(r.vehicleId)?.name.toLowerCase().includes(q))
     const matchStatus   = status === 'all' || r.status === status
     const matchPriority = priority === 'all' || r.priority === priority
     return matchSearch && matchStatus && matchPriority
@@ -136,12 +134,12 @@ export default function Maintenance() {
   })
 
   const stats = {
-    total:       maintenanceRecords.length,
-    active:      maintenanceRecords.filter(r => r.status === 'in-progress').length,
-    scheduled:   maintenanceRecords.filter(r => r.status === 'scheduled').length,
-    overdue:     maintenanceRecords.filter(r => isOverdue(r)).length,
-    completed:   maintenanceRecords.filter(r => r.status === 'completed').length,
-    totalCost:   maintenanceRecords.filter(r => r.status === 'completed').reduce((a, r) => a + r.cost, 0),
+    total:     allMaintenance.length,
+    active:    allMaintenance.filter(r => r.status === 'in-progress').length,
+    scheduled: allMaintenance.filter(r => r.status === 'scheduled').length,
+    overdue:   allMaintenance.filter(r => isOverdue(r)).length,
+    completed: allMaintenance.filter(r => r.status === 'completed').length,
+    totalCost: allMaintenance.filter(r => r.status === 'completed').reduce((a, r) => a + r.cost, 0),
   }
 
   return (
@@ -149,9 +147,9 @@ export default function Maintenance() {
       {/* Summary */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'In Progress', value: stats.active,    color: 'text-cyan-700' },
-          { label: 'Overdue',     value: stats.overdue,   color: stats.overdue > 0 ? 'text-red-600' : 'text-fleet-text' },
-          { label: 'Scheduled',   value: stats.scheduled, color: 'text-yellow-700' },
+          { label: 'In Progress', value: stats.active,    color: 'text-fleet-cyan' },
+          { label: 'Overdue',     value: stats.overdue,   color: stats.overdue > 0 ? 'text-fleet-red' : 'text-fleet-text' },
+          { label: 'Scheduled',   value: stats.scheduled, color: 'text-fleet-yellow' },
           { label: 'Total Cost (YTD)', value: `$${stats.totalCost.toLocaleString()}`, color: 'text-fleet-amber' },
         ].map(({ label, value, color }) => (
           <div key={label} className="stat-card">
@@ -164,8 +162,8 @@ export default function Maintenance() {
       {/* Overdue banner */}
       {stats.overdue > 0 && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 flex items-center gap-3">
-          <AlertTriangle size={16} className="text-red-600 flex-shrink-0" />
-          <span className="text-sm text-red-700">
+          <AlertTriangle size={16} className="text-fleet-red flex-shrink-0" />
+          <span className="text-sm text-fleet-red">
             <strong>{stats.overdue} maintenance item(s)</strong> are overdue and require immediate attention.
           </span>
         </div>

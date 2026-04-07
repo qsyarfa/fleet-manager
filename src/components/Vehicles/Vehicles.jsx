@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Search, Filter, MapPin, Fuel, Gauge, Thermometer, User } from 'lucide-react'
-import { vehicles, getDriver } from '../../data/mockData'
+import { vehicles as allVehicles, getDriver } from '../../data/mockData'
 
 const STATUS_BADGE = {
   active:      'badge-active',
@@ -11,19 +11,19 @@ const STATUS_BADGE = {
 }
 
 const STATUS_DOT = {
-  active:      'bg-green-400',
-  enroute:     'bg-cyan-400',
-  idle:        'bg-yellow-400',
-  maintenance: 'bg-orange-400',
-  offline:     'bg-red-400',
+  active:      'bg-fleet-green',
+  enroute:     'bg-fleet-cyan',
+  idle:        'bg-fleet-yellow',
+  maintenance: 'bg-fleet-orange',
+  offline:     'bg-fleet-red',
 }
 
 const STATUSES = ['all', 'active', 'enroute', 'idle', 'maintenance', 'offline']
 const TYPES    = ['all', 'Heavy Truck', 'Medium Truck', 'Cargo Van']
 
 function FuelIndicator({ level }) {
-  const color = level < 20 ? 'bg-red-500' : level < 40 ? 'bg-yellow-500' : 'bg-green-500'
-  const textColor = level < 20 ? 'text-red-600' : level < 40 ? 'text-yellow-700' : 'text-fleet-subtext'
+  const color     = level < 20 ? 'bg-fleet-red' : level < 40 ? 'bg-fleet-yellow' : 'bg-fleet-green'
+  const textColor = level < 20 ? 'text-fleet-red' : level < 40 ? 'text-fleet-yellow' : 'text-fleet-subtext'
   return (
     <div className="flex items-center gap-2 w-28">
       <div className="progress-bar flex-1">
@@ -35,7 +35,6 @@ function FuelIndicator({ level }) {
 }
 
 function VehicleDetailModal({ vehicle, onClose }) {
-  const driver = getDriver(vehicle.driverId)
   const lastPing = new Date(vehicle.lastPing)
 
   return (
@@ -66,12 +65,12 @@ function VehicleDetailModal({ vehicle, onClose }) {
                 <div className="text-xs text-fleet-subtext">mph</div>
               </div>
               <div className="bg-fleet-surface rounded-lg p-3 text-center">
-                <Fuel size={14} className={`mx-auto mb-1 ${vehicle.fuelLevel < 20 ? 'text-red-600' : 'text-fleet-amber'}`} />
-                <div className={`text-xl font-bold font-mono ${vehicle.fuelLevel < 20 ? 'text-red-600' : 'text-fleet-text'}`}>{vehicle.fuelLevel}%</div>
+                <Fuel size={14} className={`mx-auto mb-1 ${vehicle.fuelLevel < 20 ? 'text-fleet-red' : 'text-fleet-amber'}`} />
+                <div className={`text-xl font-bold font-mono ${vehicle.fuelLevel < 20 ? 'text-fleet-red' : 'text-fleet-text'}`}>{vehicle.fuelLevel}%</div>
                 <div className="text-xs text-fleet-subtext">fuel</div>
               </div>
               <div className="bg-fleet-surface rounded-lg p-3 text-center">
-                <Thermometer size={14} className="mx-auto text-cyan-700 mb-1" />
+                <Thermometer size={14} className="mx-auto text-fleet-cyan mb-1" />
                 <div className="text-xl font-bold font-mono text-fleet-text">{vehicle.engineTemp}°</div>
                 <div className="text-xs text-fleet-subtext">engine °F</div>
               </div>
@@ -110,7 +109,7 @@ function VehicleDetailModal({ vehicle, onClose }) {
                 <User size={12} className="text-fleet-amber" />
                 <span className="text-xs text-fleet-subtext font-mono">Driver</span>
               </div>
-              <div className="text-xs text-fleet-text">{driver ? driver.name : '— Unassigned'}</div>
+              <div className="text-xs text-fleet-text">{getDriver(vehicle.driverId)?.name ?? '— Unassigned'}</div>
             </div>
           </div>
         </div>
@@ -125,7 +124,7 @@ export default function Vehicles() {
   const [type, setType]         = useState('all')
   const [selected, setSelected] = useState(null)
 
-  const filtered = vehicles.filter(v => {
+  const filtered = allVehicles.filter(v => {
     const matchSearch = v.name.toLowerCase().includes(search.toLowerCase())
       || v.id.toLowerCase().includes(search.toLowerCase())
       || v.plate.toLowerCase().includes(search.toLowerCase())
@@ -166,7 +165,7 @@ export default function Vehicles() {
           </select>
         </div>
         <div className="ml-auto text-xs font-mono text-fleet-subtext">
-          {filtered.length} / {vehicles.length} vehicles
+          {filtered.length} / {allVehicles.length} vehicles
         </div>
       </div>
 
@@ -182,55 +181,54 @@ export default function Vehicles() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(v => {
-                const driver = getDriver(v.driverId)
-                return (
-                  <tr
-                    key={v.id}
-                    className="table-row cursor-pointer"
-                    onClick={() => setSelected(v)}
-                  >
-                    <td className="table-cell">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[v.status]}`} />
-                        <div>
-                          <div className="text-fleet-text font-medium text-sm">{v.name}</div>
-                          <div className="text-fleet-subtext text-xs font-mono">{v.id} · {v.plate}</div>
-                        </div>
+              {filtered.map(v => (
+                <tr
+                  key={v.id}
+                  className="table-row cursor-pointer"
+                  onClick={() => setSelected(v)}
+                >
+                  <td className="table-cell">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[v.status]}`} />
+                      <div>
+                        <div className="text-fleet-text font-medium text-sm">{v.name}</div>
+                        <div className="text-fleet-subtext text-xs font-mono">{v.id} · {v.plate}</div>
                       </div>
-                    </td>
-                    <td className="table-cell">
-                      <span className="text-fleet-subtext text-xs">{v.type}</span>
-                    </td>
-                    <td className="table-cell">
-                      <span className={STATUS_BADGE[v.status]}>{v.status}</span>
-                    </td>
-                    <td className="table-cell">
-                      <span className="text-sm text-fleet-text">{driver ? driver.name : <span className="text-fleet-subtext italic">Unassigned</span>}</span>
-                    </td>
-                    <td className="table-cell">
-                      <div className="flex items-center gap-1 max-w-[180px]">
-                        <MapPin size={11} className="text-fleet-subtext flex-shrink-0" />
-                        <span className="text-xs text-fleet-subtext truncate">{v.location}</span>
-                      </div>
-                    </td>
-                    <td className="table-cell">
-                      <FuelIndicator level={v.fuelLevel} />
-                    </td>
-                    <td className="table-cell">
-                      <span className="font-mono text-sm text-fleet-text">{v.speed} <span className="text-fleet-subtext text-xs">mph</span></span>
-                    </td>
-                    <td className="table-cell">
-                      <span className="font-mono text-sm text-fleet-text">{v.odometer.toLocaleString()} <span className="text-fleet-subtext text-xs">mi</span></span>
-                    </td>
-                    <td className="table-cell">
-                      <span className={`text-xs font-mono ${new Date(v.nextService) <= new Date() ? 'text-red-600' : 'text-fleet-subtext'}`}>
-                        {v.nextService}
-                      </span>
-                    </td>
-                  </tr>
-                )
-              })}
+                    </div>
+                  </td>
+                  <td className="table-cell">
+                    <span className="text-fleet-subtext text-xs">{v.type}</span>
+                  </td>
+                  <td className="table-cell">
+                    <span className={STATUS_BADGE[v.status]}>{v.status}</span>
+                  </td>
+                  <td className="table-cell">
+                    <span className="text-sm text-fleet-text">
+                      {getDriver(v.driverId)?.name ?? <span className="text-fleet-subtext italic">Unassigned</span>}
+                    </span>
+                  </td>
+                  <td className="table-cell">
+                    <div className="flex items-center gap-1 max-w-[180px]">
+                      <MapPin size={11} className="text-fleet-subtext flex-shrink-0" />
+                      <span className="text-xs text-fleet-subtext truncate">{v.location}</span>
+                    </div>
+                  </td>
+                  <td className="table-cell">
+                    <FuelIndicator level={v.fuelLevel} />
+                  </td>
+                  <td className="table-cell">
+                    <span className="font-mono text-sm text-fleet-text">{v.speed} <span className="text-fleet-subtext text-xs">mph</span></span>
+                  </td>
+                  <td className="table-cell">
+                    <span className="font-mono text-sm text-fleet-text">{v.odometer.toLocaleString()} <span className="text-fleet-subtext text-xs">mi</span></span>
+                  </td>
+                  <td className="table-cell">
+                    <span className={`text-xs font-mono ${new Date(v.nextService) <= new Date() ? 'text-fleet-red' : 'text-fleet-subtext'}`}>
+                      {v.nextService}
+                    </span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

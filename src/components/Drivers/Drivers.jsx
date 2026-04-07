@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Search, Star, Phone, Mail, Truck, Shield, AlertTriangle } from 'lucide-react'
-import { drivers, getVehicle } from '../../data/mockData'
+import { drivers as allDrivers, getVehicle } from '../../data/mockData'
 
 const DUTY_BADGE = {
   'on-duty':  'badge-active',
@@ -10,14 +10,16 @@ const DUTY_BADGE = {
 
 const AVATAR_COLORS = [
   'bg-fleet-amber text-black',
-  'bg-cyan-500 text-black',
+  'bg-fleet-cyan text-black',
   'bg-purple-500 text-white',
-  'bg-green-500 text-black',
+  'bg-fleet-green text-black',
   'bg-pink-500 text-white',
   'bg-indigo-500 text-white',
   'bg-teal-500 text-black',
   'bg-rose-500 text-white',
 ]
+
+const STATUSES = ['all', 'on-duty', 'off-duty', 'standby']
 
 function isExpired(dateStr) {
   return new Date(dateStr) < new Date()
@@ -46,11 +48,10 @@ function StarRating({ rating }) {
   )
 }
 
-function DriverCard({ driver }) {
-  const vehicle = getVehicle(driver.vehicleId)
-  const licenseExpired = isExpired(driver.licenseExpiry)
+function DriverCard({ driver, colorIndex }) {
+  const licenseExpired  = isExpired(driver.licenseExpiry)
   const licenseExpiring = isExpiringSoon(driver.licenseExpiry)
-  const avatarColor = AVATAR_COLORS[drivers.indexOf(driver) % AVATAR_COLORS.length]
+  const avatarColor     = AVATAR_COLORS[colorIndex % AVATAR_COLORS.length]
 
   return (
     <div className="bg-fleet-card border border-fleet-border rounded-lg p-5 hover:border-fleet-muted transition-colors">
@@ -72,12 +73,12 @@ function DriverCard({ driver }) {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2 mb-4">
         {[
-          { label: 'Trips',     value: driver.totalTrips },
-          { label: 'Miles',     value: `${(driver.totalMiles / 1000).toFixed(0)}k` },
+          { label: 'Trips',      value: driver.totalTrips },
+          { label: 'Miles',      value: `${(driver.totalMiles / 1000).toFixed(0)}k` },
           { label: 'Violations', value: driver.violations },
         ].map(({ label, value }) => (
           <div key={label} className="bg-fleet-surface rounded-lg p-2 text-center">
-            <div className={`text-lg font-bold font-mono ${label === 'Violations' && driver.violations > 0 ? 'text-red-600' : 'text-fleet-text'}`}>
+            <div className={`text-lg font-bold font-mono ${label === 'Violations' && driver.violations > 0 ? 'text-fleet-red' : 'text-fleet-text'}`}>
               {value}
             </div>
             <div className="text-xs text-fleet-subtext">{label}</div>
@@ -88,16 +89,16 @@ function DriverCard({ driver }) {
       {/* Info rows */}
       <div className="space-y-1.5 text-xs">
         <div className="flex items-center gap-2 text-fleet-subtext">
-          <Shield size={11} className={licenseExpired ? 'text-red-600' : licenseExpiring ? 'text-yellow-700' : 'text-fleet-amber'} />
+          <Shield size={11} className={licenseExpired ? 'text-fleet-red' : licenseExpiring ? 'text-fleet-yellow' : 'text-fleet-amber'} />
           <span className="font-mono">{driver.license}</span>
-          <span className={`ml-auto font-mono ${licenseExpired ? 'text-red-600 font-bold' : licenseExpiring ? 'text-yellow-700' : 'text-fleet-subtext'}`}>
+          <span className={`ml-auto font-mono ${licenseExpired ? 'text-fleet-red font-bold' : licenseExpiring ? 'text-fleet-yellow' : 'text-fleet-subtext'}`}>
             {licenseExpired ? 'EXPIRED' : licenseExpiring ? 'Exp. soon' : driver.licenseExpiry}
           </span>
         </div>
         <div className="flex items-center gap-2 text-fleet-subtext">
           <Truck size={11} />
-          <span>{vehicle ? vehicle.name : <span className="italic">No vehicle assigned</span>}</span>
-          {vehicle && <span className="ml-auto font-mono text-fleet-amber">{vehicle.id}</span>}
+          <span>{getVehicle(driver.vehicleId)?.name ?? <span className="italic">No vehicle assigned</span>}</span>
+          {driver.vehicleId && <span className="ml-auto font-mono text-fleet-amber">{driver.vehicleId}</span>}
         </div>
         <div className="flex items-center gap-2 text-fleet-subtext">
           <Phone size={11} />
@@ -112,8 +113,8 @@ function DriverCard({ driver }) {
       {/* Alerts */}
       {(licenseExpired || licenseExpiring) && (
         <div className={`mt-3 flex items-center gap-2 p-2 rounded ${licenseExpired ? 'bg-red-500/10 border border-red-500/30' : 'bg-yellow-500/10 border border-yellow-500/30'}`}>
-          <AlertTriangle size={11} className={licenseExpired ? 'text-red-600' : 'text-yellow-700'} />
-          <span className={`text-xs font-mono ${licenseExpired ? 'text-red-600' : 'text-yellow-700'}`}>
+          <AlertTriangle size={11} className={licenseExpired ? 'text-fleet-red' : 'text-fleet-yellow'} />
+          <span className={`text-xs font-mono ${licenseExpired ? 'text-fleet-red' : 'text-fleet-yellow'}`}>
             {licenseExpired ? 'License EXPIRED — grounded' : 'License expiring within 90 days'}
           </span>
         </div>
@@ -126,9 +127,7 @@ export default function Drivers() {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('all')
 
-  const STATUSES = ['all', 'on-duty', 'off-duty', 'standby']
-
-  const filtered = drivers.filter(d => {
+  const filtered = allDrivers.filter(d => {
     const q = search.toLowerCase()
     const matchSearch = d.name.toLowerCase().includes(q)
       || d.id.toLowerCase().includes(q)
@@ -138,11 +137,13 @@ export default function Drivers() {
   })
 
   const stats = {
-    total:    drivers.length,
-    onDuty:   drivers.filter(d => d.status === 'on-duty').length,
-    offDuty:  drivers.filter(d => d.status === 'off-duty').length,
-    expired:  drivers.filter(d => isExpired(d.licenseExpiry)).length,
-    avgRating: (drivers.reduce((a, d) => a + d.rating, 0) / drivers.length).toFixed(1),
+    total:     allDrivers.length,
+    onDuty:    allDrivers.filter(d => d.status === 'on-duty').length,
+    offDuty:   allDrivers.filter(d => d.status === 'off-duty').length,
+    expired:   allDrivers.filter(d => isExpired(d.licenseExpiry)).length,
+    avgRating: allDrivers.length
+      ? (allDrivers.reduce((a, d) => a + parseFloat(d.rating), 0) / allDrivers.length).toFixed(1)
+      : '0.0',
   }
 
   return (
@@ -150,10 +151,10 @@ export default function Drivers() {
       {/* Summary */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Total Drivers', value: stats.total,     color: 'text-fleet-text' },
-          { label: 'On Duty',       value: stats.onDuty,    color: 'text-green-600' },
-          { label: 'Off Duty',      value: stats.offDuty,   color: 'text-fleet-subtext' },
-          { label: 'Avg Rating',    value: `${stats.avgRating} ★`, color: 'text-fleet-amber' },
+          { label: 'Total Drivers', value: stats.total,              color: 'text-fleet-text' },
+          { label: 'On Duty',       value: stats.onDuty,             color: 'text-fleet-green' },
+          { label: 'Off Duty',      value: stats.offDuty,            color: 'text-fleet-subtext' },
+          { label: 'Avg Rating',    value: `${stats.avgRating} ★`,   color: 'text-fleet-amber' },
         ].map(({ label, value, color }) => (
           <div key={label} className="stat-card">
             <div className="section-header">{label}</div>
@@ -165,8 +166,8 @@ export default function Drivers() {
       {/* License alert banner */}
       {stats.expired > 0 && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 flex items-center gap-3">
-          <AlertTriangle size={16} className="text-red-600 flex-shrink-0" />
-          <span className="text-sm text-red-700">
+          <AlertTriangle size={16} className="text-fleet-red flex-shrink-0" />
+          <span className="text-sm text-fleet-red">
             <strong>{stats.expired} driver(s)</strong> have expired licenses and must be grounded until renewed.
           </span>
         </div>
@@ -206,7 +207,13 @@ export default function Drivers() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filtered.map(d => <DriverCard key={d.id} driver={d} />)}
+        {filtered.map(d => (
+          <DriverCard
+            key={d.id}
+            driver={d}
+            colorIndex={allDrivers.findIndex(x => x.id === d.id)}
+          />
+        ))}
         {filtered.length === 0 && (
           <div className="col-span-full py-16 text-center text-fleet-subtext text-sm font-mono">
             No drivers match the current filters
