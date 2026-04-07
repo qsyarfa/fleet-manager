@@ -114,58 +114,26 @@ fleetStats            // → { totalMiles, totalTrips, activeDrivers, criticalAl
 
 ## Design System
 
-### Theme — Dark Industrial
+- Dark industrial theme — use `fleet-*` Tailwind tokens only, never hardcode hex values
+- Font: Inter for UI text, JetBrains Mono for all data/IDs/timestamps (`font-mono`)
+- Use `.stat-card`, `.badge-*`, `.btn-primary` classes from `index.css` — don't reinvent them
+- Status → badge mapping: always use the `STATUS_BADGE` object pattern, not conditional strings
 
-The app uses a custom dark palette defined in `tailwind.config.js` under the `fleet` key,
-and a Google Font stack loaded in `index.html`.
+---
 
-**Color tokens:**
+## Git Conventions
 
-| Token               | Hex       | Usage                              |
-|---------------------|-----------|------------------------------------|
-| `fleet-bg`          | `#0c0d10` | Page background                    |
-| `fleet-surface`     | `#13151a` | Sidebar, header, table headers     |
-| `fleet-card`        | `#1a1d24` | Cards and panels                   |
-| `fleet-border`      | `#2a2d36` | All borders and dividers           |
-| `fleet-muted`       | `#3a3d4a` | Hover borders                      |
-| `fleet-text`        | `#e2e4ea` | Primary text                       |
-| `fleet-subtext`     | `#7a7f94` | Labels, secondary text             |
-| `fleet-amber`       | `#f59e0b` | Primary accent — buttons, icons    |
-| `fleet-cyan`        | `#06b6d4` | En-route status, live indicators   |
-| `fleet-green`       | `#22c55e` | Active/healthy status              |
-| `fleet-red`         | `#ef4444` | Offline, critical, overdue         |
-| `fleet-yellow`      | `#eab308` | Idle, warnings                     |
-| `fleet-orange`      | `#f97316` | Maintenance status                 |
+Commit format: `type: short description`
 
-**Typography:**
-- Body / UI: `Inter` (sans)
-- Telemetry data, IDs, codes, timestamps: `JetBrains Mono` (mono)
-- Use `font-mono` for any value that reads like data — odometer, fuel %, speed, dates, IDs
+Types: `feat` | `fix` | `style` | `chore` | `docs` | `refactor`
 
-### Reusable Component Classes (`index.css`)
+Example: `feat: add fuel alert threshold to dashboard`
 
-Prefer these over ad-hoc Tailwind strings for consistency:
+---
 
-```
-.stat-card          — KPI/summary card (bg, border, rounded, padding, flex col)
-.section-header     — uppercase mono label above a section
-.badge              — base badge (inline-flex, mono, xs)
-.badge-active       — green badge
-.badge-idle         — yellow badge
-.badge-offline      — red badge
-.badge-maintenance  — orange badge
-.badge-enroute      — cyan badge
-.table-row          — <tr> with border and hover
-.table-cell         — <td> with standard padding and text style
-.table-head         — <th> with uppercase mono style
-.btn-primary        — amber filled button
-.btn-ghost          — bordered ghost button
-.input-field        — dark text input with amber focus ring
-.progress-bar       — thin fuel/progress bar wrapper
-.nav-link           — sidebar nav item (inactive)
-.nav-link-active    — sidebar nav item (active amber state)
-.dot-live           — small blinking green dot for live indicators
-```
+## Custom Commands
+
+- `/new-feature <name>` — scaffolds a new page component, route, and nav link for the given feature name
 
 ---
 
@@ -228,3 +196,10 @@ Prefer these over ad-hoc Tailwind strings for consistency:
 - Do not hardcode `fleet-*` color hex values in JSX. Always use the Tailwind token.
 - Do not create wrapper components just to name a `<div>`. Keep the component tree shallow.
 - Do not add error boundaries, suspense, or lazy loading until the app has real async data.
+
+---
+
+## When Unsure
+
+If a requirement is ambiguous, ask before writing code.
+Do not assume — ask one clarifying question.
